@@ -128,7 +128,7 @@ class CocoEvaluator(Evaluator):
             dist.broadcast(metric, 0)
             metric = metric.item()
         self.reset()
-        return metric
+        return metric[0],metric
 
 
 class TfmEvaluator(Evaluator):
