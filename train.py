@@ -61,6 +61,9 @@ from effdet.anchors import Anchors, AnchorLabeler
 
 torch.backends.cudnn.benchmark = True
 
+from torch.utils.tensorboard import SummaryWriter
+
+
 
 # The first arg parser parses out only the --config argument, this argument is used to
 # load a yaml file containing key-values that override the defaults for the main parser below
@@ -433,6 +436,16 @@ def main():
         with open(os.path.join(output_dir, 'args.yaml'), 'w') as f:
             f.write(args_text)
 
+    writer = SummaryWriter(log_dir="/content/salam1")  # set however you like
+    def _to_float(x):
+        # numpy scalar -> float, torch scalar -> float, python number stays
+        if isinstance(x, (np.generic,)):
+            return float(x)
+        if torch.is_tensor(x):
+            return float(x.detach().cpu().item())
+        return float(x)
+
+
     try:
         for epoch in range(start_epoch, num_epochs):
             if args.distributed:
@@ -469,6 +482,13 @@ def main():
             if lr_scheduler is not None:
                 # step LR for next epoch
                 lr_scheduler.step(epoch + 1, eval_metrics[eval_metric])
+
+            for k, v in train_metrics.items():
+                writer.add_scalar(f"train/{k}", _to_float(v), epoch)
+
+            # eval_metrics: OrderedDict({'loss': ..., 'map': ..., ...})
+            for k, v in eval_metrics.items():
+                writer.add_scalar(f"eval/{k}", _to_float(v), epoch)
 
             if saver is not None:
                 utils.update_summary(
@@ -707,7 +727,11 @@ def validate(model, loader, args, evaluator=None, log_suffix=''):
 
     metrics = OrderedDict([('loss', losses_m.avg)])
     if evaluator is not None:
-        metrics['map'] = evaluator.evaluate()
+        # metrics['map'] = evaluator.evaluate()
+        a,b=evaluator.evaluate()
+        metrics['map'] = a        
+        metrics['map_50'] = b[1]
+        metrics['map_75'] = b[2]        
 
     return metrics
 

@@ -482,7 +482,7 @@ efficientdet_model_param_dict = dict(
         backbone_name='tf_efficientnet_b0',
         image_size=(512, 512),
         fpn_channels=64,
-        fpn_cell_repeats=3,
+        fpn_cell_repeats=1,
         box_class_repeats=3,
         backbone_args=dict(drop_path_rate=0.2),
         url='https://github.com/rwightman/efficientdet-pytorch/releases/download/v0.1/tf_efficientdet_d0_34-f153e0cf.pth',

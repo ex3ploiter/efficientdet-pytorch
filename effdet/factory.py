@@ -1,4 +1,4 @@
-from .efficientdet import EfficientDet, HeadNet
+from .efficientdet import EfficientDet
 from .bench import DetBenchTrain, DetBenchPredict
 from .config import get_efficientdet_config
 from .helpers import load_pretrained, load_checkpoint
